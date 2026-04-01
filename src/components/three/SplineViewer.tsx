@@ -90,8 +90,6 @@ export function SplineViewer({ onLoad }: SplineViewerProps) {
           onLoad={handleLoad}
         />
       </Suspense>
-      {/* Gradient overlay to hide watermark - blends naturally */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#050f1e] via-[#050f1e]/80 to-transparent pointer-events-none" />
     </div>
   );
 }
