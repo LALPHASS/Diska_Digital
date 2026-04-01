@@ -76,7 +76,7 @@ export function SplineViewer({ onLoad }: SplineViewerProps) {
   };
 
   return (
-    <div ref={containerRef} className="w-full h-full relative">
+    <div ref={containerRef} className="w-full h-full relative overflow-hidden">
       <Suspense
         fallback={
           <div className="w-full h-full flex items-center justify-center">
@@ -90,8 +90,8 @@ export function SplineViewer({ onLoad }: SplineViewerProps) {
           onLoad={handleLoad}
         />
       </Suspense>
-      {/* Overlay to cover bottom-right watermark area */}
-      <div className="absolute bottom-0 right-0 w-48 h-16 bg-[#050f1e] pointer-events-none" />
+      {/* Gradient overlay to hide watermark - blends naturally */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#050f1e] via-[#050f1e]/80 to-transparent pointer-events-none" />
     </div>
   );
 }
