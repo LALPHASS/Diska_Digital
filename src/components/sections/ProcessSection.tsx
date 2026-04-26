@@ -57,16 +57,16 @@ export function ProcessSection() {
       },
     });
 
-    // Horizontal scroll animation
+    // Horizontal scroll animation - smoother with higher scrub value
     const horizontalScroll = gsap.to(panels, {
       xPercent: -totalWidth,
       ease: 'none',
       scrollTrigger: {
         trigger: triggerRef.current,
         pin: true,
-        scrub: 1,
-        snap: 1 / (panels.length - 1),
-        end: () => '+=' + (horizontalRef.current?.offsetWidth || 0),
+        scrub: 0.5,
+        anticipatePin: 1,
+        end: () => '+=' + (horizontalRef.current?.offsetWidth || 0) * 0.75,
       },
     });
 

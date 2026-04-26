@@ -140,18 +140,10 @@ export function AboutSection() {
             {/* Paragraphs */}
             <div className="space-y-6">
               <p className="about-paragraph text-white/70 text-lg leading-relaxed">
-                Diska Digital est une entreprise technologique basée au Mali, dédiée à aider 
-                les entreprises à devenir modernes, visibles et efficaces. Nous combinons créativité 
-                et expertise technique pour livrer des solutions qui ont un réel impact.
+                Basée au Mali, Diska Digital aide les entreprises à devenir modernes, visibles et efficaces grâce à la créativité et l'expertise technique.
               </p>
               <p className="about-paragraph text-white/70 text-lg leading-relaxed">
-                Notre mission est de combler le fossé entre les pratiques commerciales traditionnelles 
-                et le monde numérique, permettant aux entreprises locales et internationales de 
-                prospérer dans un marché de plus en plus connecté.
-              </p>
-              <p className="about-paragraph text-white/70 text-lg leading-relaxed">
-                Du développement web aux services IT, en passant par le branding et la communication print, 
-                nous offrons des solutions complètes adaptées à vos besoins uniques.
+                Notre mission : connecter les entreprises au monde numérique pour les faire prospérer dans un marché toujours plus connecté.
               </p>
             </div>
 
