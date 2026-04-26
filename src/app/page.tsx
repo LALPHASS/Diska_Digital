@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { Navbar } from '@/components/layout/Navbar';
 import { HeroSection } from '@/components/sections/HeroSection';
@@ -16,23 +15,17 @@ import { Footer } from '@/components/layout/Footer';
  * HomePage - Composes all sections together for the Diska Digital website
  */
 export default function Home() {
-  const [isSplineLoaded, setIsSplineLoaded] = useState(false);
-
-  const handleSplineLoad = () => {
-    setIsSplineLoaded(true);
-  };
-
   return (
     <>
-      {/* Loading screen - waits for Spline 3D to load */}
-      <LoadingScreen isSplineLoaded={isSplineLoaded} />
+      {/* Quick branded loading screen */}
+      <LoadingScreen />
       
       {/* Sticky navigation bar with glassmorphism effect */}
       <Navbar />
       
       {/* Main content area containing all sections */}
       <main className="flex flex-col">
-        <HeroSection onSplineLoad={handleSplineLoad} />
+        <HeroSection />
         <ServicesSection />
         <AboutSection />
         <ProcessSection />
