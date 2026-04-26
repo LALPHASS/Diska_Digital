@@ -2,47 +2,18 @@
 
 import { useRef } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-/**
- * About Section describing Diska Digital's identity and mission.
- */
 export function AboutSection() {
   const containerRef = useRef<HTMLElement>(null);
 
   useGSAP(() => {
-    // Main title animation
-    gsap.from('.about-title', {
-      opacity: 0,
-      y: 100,
-      duration: 1,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: '.about-title',
-        start: 'top 85%',
-        toggleActions: 'play none none reverse',
-      },
-    });
-
-    // Paragraphs staggered animation
-    gsap.from('.about-paragraph', {
-      opacity: 0,
-      y: 60,
-      duration: 0.8,
-      stagger: 0.2,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: '.about-content',
-        start: 'top 75%',
-        toggleActions: 'play none none reverse',
-      },
-    });
-
-    // Image reveal with clip-path
     gsap.from('.about-image-wrapper', {
       clipPath: 'inset(100% 0% 0% 0%)',
       duration: 1.2,
@@ -54,9 +25,8 @@ export function AboutSection() {
       },
     });
 
-    // Image parallax effect
     gsap.to('.about-image', {
-      yPercent: -20,
+      yPercent: -15,
       ease: 'none',
       scrollTrigger: {
         trigger: '.about-image-wrapper',
@@ -65,47 +35,6 @@ export function AboutSection() {
         scrub: 1,
       },
     });
-
-    // Floating badge animation
-    gsap.from('.about-badge', {
-      scale: 0,
-      rotation: -180,
-      opacity: 0,
-      duration: 1,
-      ease: 'back.out(1.7)',
-      scrollTrigger: {
-        trigger: '.about-badge',
-        start: 'top 85%',
-        toggleActions: 'play none none reverse',
-      },
-    });
-
-    // Stats counter animation
-    gsap.from('.stat-item', {
-      opacity: 0,
-      y: 40,
-      duration: 0.6,
-      stagger: 0.15,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: '.stats-container',
-        start: 'top 85%',
-        toggleActions: 'play none none reverse',
-      },
-    });
-
-    // Decorative lines animation
-    gsap.from('.deco-line', {
-      scaleX: 0,
-      duration: 1,
-      ease: 'power3.inOut',
-      scrollTrigger: {
-        trigger: '.about-content',
-        start: 'top 70%',
-        toggleActions: 'play none none reverse',
-      },
-    });
-
   }, { scope: containerRef });
 
   return (
@@ -116,57 +45,14 @@ export function AboutSection() {
     >
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Text Content - Left */}
-          <div className="about-content">
-            {/* Badge */}
-            <div className="mb-6">
-              <span className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/50 border border-white/10 rounded-full">
-                <span className="w-2 h-2 bg-[#06b6d4] rounded-full" />
-                À Propos
-              </span>
-            </div>
-
-            {/* Title */}
-            <h2 className="about-title text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-white leading-tight">
-              Qui Sommes{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#06b6d4] to-[#0066cc]">
-                Nous
-              </span>
-            </h2>
-
-            {/* Decorative line */}
-            <div className="deco-line h-1 w-24 bg-gradient-to-r from-[#06b6d4] to-transparent rounded-full mb-8 origin-left" />
-
-            {/* Paragraphs */}
-            <div className="space-y-6">
-              <p className="about-paragraph text-white/70 text-lg leading-relaxed">
-                Basée au Mali, Diska Digital aide les entreprises à devenir modernes, visibles et efficaces grâce à la créativité et l'expertise technique.
-              </p>
-              <p className="about-paragraph text-white/70 text-lg leading-relaxed">
-                Notre mission : connecter les entreprises au monde numérique pour les faire prospérer dans un marché toujours plus connecté.
-              </p>
-            </div>
-
-            {/* Stats */}
-            <div className="stats-container grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-white/10">
-              <div className="stat-item">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">50+</div>
-                <div className="text-white/40 text-sm">Projets Réalisés</div>
-              </div>
-              <div className="stat-item">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">30+</div>
-                <div className="text-white/40 text-sm">Clients Satisfaits</div>
-              </div>
-              <div className="stat-item">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">5+</div>
-                <div className="text-white/40 text-sm">Ans d'Expérience</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Image - Right */}
-          <div className="relative">
-            {/* Main image */}
+          {/* Image - Left */}
+          <motion.div 
+            className="relative order-2 lg:order-1"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
             <div className="about-image-wrapper relative aspect-[4/5] rounded-2xl overflow-hidden">
               <Image
                 src="/who are we.jpg"
@@ -176,20 +62,71 @@ export function AboutSection() {
                 className="about-image object-cover scale-125"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-              {/* Overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050f1e]/80 via-transparent to-[#050f1e]/20" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050f1e]/60 via-transparent to-transparent" />
             </div>
 
-            {/* Floating badge */}
-            <div className="about-badge absolute -bottom-6 -left-6 lg:-bottom-8 lg:-left-8 w-32 h-32 lg:w-40 lg:h-40 rounded-2xl bg-white flex flex-col items-center justify-center shadow-2xl">
-              <span className="text-4xl lg:text-5xl font-bold text-[#050f1e]">DD</span>
-              <span className="text-[#050f1e]/60 text-xs mt-1">Depuis 2020</span>
+            {/* Badge flottant */}
+            <motion.div 
+              className="absolute -bottom-4 -right-4 lg:-bottom-6 lg:-right-6 px-6 py-4 rounded-xl bg-cyan-500 text-white shadow-xl"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <div className="text-3xl font-bold">5+</div>
+              <div className="text-sm text-white/80">Ans d&apos;expérience</div>
+            </motion.div>
+          </motion.div>
+
+          {/* Text Content - Right */}
+          <motion.div 
+            className="order-1 lg:order-2"
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="text-cyan-400 text-sm uppercase tracking-[0.2em] mb-4 block">
+              À Propos
+            </span>
+
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white leading-tight">
+              Qui Sommes <span className="text-cyan-400">Nous</span>
+            </h2>
+
+            <div className="w-16 h-1 bg-cyan-500 rounded-full mb-8" />
+
+            <p className="text-white/60 text-lg leading-relaxed mb-6">
+              Basée au Mali, <span className="text-white font-medium">Diska Digital</span>{' '}aide les entreprises à devenir modernes, visibles et efficaces grâce à la créativité et l&apos;expertise technique.
+            </p>
+
+            <p className="text-white/60 text-lg leading-relaxed mb-8">
+              Notre mission : connecter les entreprises au monde numérique pour les faire prospérer.
+            </p>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-6 mb-8 py-6 border-y border-white/10">
+              {[
+                { value: '50+', label: 'Projets' },
+                { value: '30+', label: 'Clients' },
+                { value: '98%', label: 'Satisfaction' },
+              ].map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
+                  <div className="text-white/40 text-sm">{stat.label}</div>
+                </div>
+              ))}
             </div>
 
-            {/* Decorative elements */}
-            <div className="absolute -top-4 -right-4 w-24 h-24 border-2 border-[#06b6d4]/30 rounded-2xl" />
-            <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-[#06b6d4]/20 rounded-xl blur-xl" />
-          </div>
+            {/* CTA */}
+            <button 
+              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              className="group inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
+            >
+              Travaillons ensemble
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </motion.div>
         </div>
       </div>
     </section>

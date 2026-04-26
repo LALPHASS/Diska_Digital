@@ -47,9 +47,9 @@ export function ProcessSection() {
     // Header animation
     gsap.from('.process-header', {
       opacity: 0,
-      y: 80,
-      duration: 1,
-      ease: 'power3.out',
+      y: 60,
+      duration: 1.2,
+      ease: 'power2.out',
       scrollTrigger: {
         trigger: '.process-header',
         start: 'top 85%',
@@ -57,90 +57,70 @@ export function ProcessSection() {
       },
     });
 
-    // Horizontal scroll animation - smoother with higher scrub value
+    // Horizontal scroll animation - much smoother with higher scrub value
     const horizontalScroll = gsap.to(panels, {
       xPercent: -totalWidth,
       ease: 'none',
       scrollTrigger: {
         trigger: triggerRef.current,
         pin: true,
-        scrub: 0.5,
+        scrub: 1.5, // Higher value = smoother, more delayed response
         anticipatePin: 1,
-        end: () => '+=' + (horizontalRef.current?.offsetWidth || 0) * 0.75,
+        end: () => '+=' + (horizontalRef.current?.offsetWidth || 0) * 0.8,
+        invalidateOnRefresh: true,
       },
     });
 
-    // Animate each panel's content as it comes into view
-    panels.forEach((panel, i) => {
+    // Simplified panel animations - less complex for smoother feel
+    panels.forEach((panel) => {
       const panelEl = panel as HTMLElement;
       
-      // Image reveal
-      gsap.from(panelEl.querySelector('.panel-image'), {
-        scale: 1.3,
-        opacity: 0,
+      // Combined content animation - simpler, smoother
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: panelEl,
+          containerAnimation: horizontalScroll,
+          start: 'left 85%',
+          end: 'left 20%',
+          scrub: 1, // Scrub the panel animations too for smoothness
+        },
+      });
+
+      tl.from(panelEl.querySelector('.panel-image'), {
+        scale: 1.1,
+        opacity: 0.3,
         duration: 1,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: panelEl,
-          containerAnimation: horizontalScroll,
-          start: 'left 80%',
-          toggleActions: 'play none none reverse',
-        },
-      });
-
-      // Number animation
-      gsap.from(panelEl.querySelector('.panel-number'), {
-        scale: 0,
-        rotation: -180,
+        ease: 'power2.out',
+      }, 0)
+      .from(panelEl.querySelector('.panel-number'), {
+        scale: 0.5,
         opacity: 0,
         duration: 0.8,
-        ease: 'back.out(1.7)',
-        scrollTrigger: {
-          trigger: panelEl,
-          containerAnimation: horizontalScroll,
-          start: 'left 70%',
-          toggleActions: 'play none none reverse',
-        },
-      });
-
-      // Title slide in
-      gsap.from(panelEl.querySelector('.panel-title'), {
-        x: 100,
+        ease: 'power2.out',
+      }, 0.1)
+      .from(panelEl.querySelector('.panel-title'), {
+        x: 60,
         opacity: 0,
         duration: 0.8,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: panelEl,
-          containerAnimation: horizontalScroll,
-          start: 'left 60%',
-          toggleActions: 'play none none reverse',
-        },
-      });
-
-      // Description fade in
-      gsap.from(panelEl.querySelector('.panel-description'), {
-        y: 40,
+        ease: 'power2.out',
+      }, 0.2)
+      .from(panelEl.querySelector('.panel-description'), {
+        y: 30,
         opacity: 0,
         duration: 0.8,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: panelEl,
-          containerAnimation: horizontalScroll,
-          start: 'left 50%',
-          toggleActions: 'play none none reverse',
-        },
-      });
+        ease: 'power2.out',
+      }, 0.3);
     });
 
-    // Progress bar animation
+    // Progress bar animation - synced with scroll
     gsap.to('.progress-fill', {
       width: '100%',
       ease: 'none',
       scrollTrigger: {
         trigger: triggerRef.current,
         start: 'top top',
-        end: () => '+=' + (horizontalRef.current?.offsetWidth || 0),
-        scrub: 1,
+        end: () => '+=' + (horizontalRef.current?.offsetWidth || 0) * 0.8,
+        scrub: 1.5, // Match main scroll scrub
       },
     });
 

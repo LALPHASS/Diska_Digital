@@ -290,24 +290,40 @@ export function HeroSection({ onSplineLoad }: HeroSectionProps) {
         </div>
       )}
 
-      {/* Floating particles */}
+      {/* Floating particles - fixed positions to avoid hydration mismatch */}
       {!prefersReducedMotion && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {Array.from({ length: 25 }).map((_, i) => (
+          {[
+            { top: '25%', left: '10%', duration: 4, delay: 0 },
+            { top: '35%', left: '25%', duration: 5, delay: 1 },
+            { top: '45%', left: '40%', duration: 6, delay: 2 },
+            { top: '30%', left: '55%', duration: 4.5, delay: 0.5 },
+            { top: '55%', left: '70%', duration: 5.5, delay: 1.5 },
+            { top: '40%', left: '85%', duration: 4, delay: 2.5 },
+            { top: '65%', left: '15%', duration: 6, delay: 3 },
+            { top: '50%', left: '30%', duration: 5, delay: 0.8 },
+            { top: '70%', left: '50%', duration: 4.5, delay: 1.8 },
+            { top: '60%', left: '65%', duration: 5.5, delay: 2.8 },
+            { top: '75%', left: '80%', duration: 4, delay: 0.3 },
+            { top: '28%', left: '92%', duration: 6, delay: 1.3 },
+            { top: '48%', left: '5%', duration: 5, delay: 2.3 },
+            { top: '38%', left: '18%', duration: 4.5, delay: 3.3 },
+            { top: '58%', left: '35%', duration: 5.5, delay: 0.6 },
+          ].map((particle, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 0 }}
               animate={{ opacity: [0, 0.6, 0], y: [0, -40, 0] }}
               transition={{
-                duration: 3 + Math.random() * 4,
+                duration: particle.duration,
                 repeat: Infinity,
-                delay: Math.random() * 5,
+                delay: particle.delay,
                 ease: "easeInOut",
               }}
               className="absolute w-1 h-1 bg-cyan-400/40 rounded-full"
               style={{
-                top: `${20 + Math.random() * 60}%`,
-                left: `${Math.random() * 100}%`,
+                top: particle.top,
+                left: particle.left,
               }}
             />
           ))}
@@ -338,16 +354,11 @@ export function HeroSection({ onSplineLoad }: HeroSectionProps) {
             ref={headingRef}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.1] mb-4 font-heading perspective-[1000px]"
           >
-            <span className="hero-word bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80">Vos idées, </span>
-            <span className="hero-word hero-gradient bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400">
+            <span className="hero-word text-white">Vos idées, </span>
+            <span className="hero-word hero-gradient text-cyan-400">
               notre expertise
             </span>
           </h1>
-
-          {/* Tagline */}
-          <p className="text-lg md:text-xl lg:text-2xl text-white/70 font-light mb-6 tracking-wide">
-            Des résultats qui parlent d&apos;eux-mêmes.
-          </p>
 
           {/* Decorative line */}
           <motion.div 

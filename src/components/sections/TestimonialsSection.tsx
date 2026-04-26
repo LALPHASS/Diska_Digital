@@ -1,10 +1,10 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import { Quote, Star } from 'lucide-react';
+import { useRef, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { TESTIMONIALS } from '@/lib/constants';
 
-// Get initials from name
 function getInitials(name: string): string {
   return name
     .split(' ')
@@ -16,45 +16,34 @@ function getInitials(name: string): string {
 
 export function TestimonialsSection() {
   const containerRef = useRef<HTMLElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
 
   useEffect(() => {
-    let ctx: ReturnType<typeof import('gsap').default.context> | null = null;
-
-    const initAnimations = async () => {
-      const gsapModule = await import('gsap');
-      const scrollTriggerModule = await import('gsap/ScrollTrigger');
-      
-      const gsap = gsapModule.default;
-      const ScrollTrigger = scrollTriggerModule.ScrollTrigger;
-      
-      gsap.registerPlugin(ScrollTrigger);
-
-      if (!containerRef.current) return;
-
-      ctx = gsap.context(() => {
-        gsap.fromTo('.testimonial-card',
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.2,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: '.testimonials-grid',
-              start: 'top 85%',
-            },
-          }
-        );
-      }, containerRef);
-    };
-
-    initAnimations();
-
-    return () => {
-      ctx?.revert();
-    };
+    const interval = setInterval(() => {
+      setDirection(1);
+      setActiveIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+    }, 6000);
+    return () => clearInterval(interval);
   }, []);
+
+  const handlePrev = () => {
+    setDirection(-1);
+    setActiveIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+  };
+
+  const handleNext = () => {
+    setDirection(1);
+    setActiveIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+  };
+
+  const slideVariants = {
+    enter: (direction: number) => ({ x: direction > 0 ? 200 : -200, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (direction: number) => ({ x: direction < 0 ? 200 : -200, opacity: 0 }),
+  };
+
+  const activeTestimonial = TESTIMONIALS[activeIndex];
 
   return (
     <section
@@ -62,66 +51,94 @@ export function TestimonialsSection() {
       id="testimonials"
       className="py-24 lg:py-32 px-4 md:px-8 lg:px-16 bg-white overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <span className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] text-[#050f1e]/50 border border-[#050f1e]/10 rounded-full mb-6">
-            <span className="w-2 h-2 bg-[#06b6d4] rounded-full" />
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <span className="text-cyan-600 text-sm uppercase tracking-[0.2em] mb-4 block">
             Témoignages
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#050f1e] mb-4">
-            Ce Que Disent{' '}
-            <span className="text-[#06b6d4]">Nos Clients</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-[#050f1e]">
+            Ce Que Disent <span className="text-cyan-500">Nos Clients</span>
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-            La confiance des entreprises au Mali et au-delà
-          </p>
-        </div>
+        </motion.div>
 
-        {/* Testimonials Grid */}
-        <div className="testimonials-grid grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {TESTIMONIALS.map((testimonial) => (
-            <div
-              key={testimonial.name}
-              className="testimonial-card group relative p-8 bg-gray-50 rounded-3xl border border-gray-100 cursor-pointer transition-transform duration-150 ease-out hover:-translate-y-2 hover:shadow-xl"
+        {/* Testimonial */}
+        <div className="relative min-h-[300px] flex items-center">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={activeIndex}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full text-center"
             >
-              {/* Quote icon */}
-              <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-[#050f1e] flex items-center justify-center shadow-lg transition-transform duration-150 ease-out group-hover:scale-110 group-hover:rotate-3">
-                <Quote className="w-5 h-5 text-white" />
-              </div>
-
               {/* Stars */}
-              <div className="flex gap-1 mb-6 pt-4">
+              <div className="flex justify-center gap-1 mb-6">
                 {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-5 h-5 fill-yellow-400 text-yellow-400"
-                  />
+                  <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
 
-              {/* Testimonial text */}
-              <p className="text-gray-700 leading-relaxed mb-8 text-lg">
-                &ldquo;{testimonial.text}&rdquo;
-              </p>
+              {/* Quote */}
+              <blockquote className="text-xl md:text-2xl lg:text-3xl text-[#050f1e] leading-relaxed mb-8 font-light">
+                &ldquo;{activeTestimonial.text}&rdquo;
+              </blockquote>
 
-              {/* Client info */}
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#050f1e] to-[#0a1a2e] flex items-center justify-center shadow-lg transition-transform duration-150 ease-out group-hover:scale-105">
-                  <span className="text-white font-bold text-lg">
-                    {getInitials(testimonial.name)}
-                  </span>
+              {/* Author */}
+              <div className="flex items-center justify-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                  <span className="text-white font-bold">{getInitials(activeTestimonial.name)}</span>
                 </div>
-                <div>
-                  <h4 className="font-bold text-[#050f1e] text-lg">{testimonial.name}</h4>
-                  <p className="text-gray-500">{testimonial.company}</p>
+                <div className="text-left">
+                  <h4 className="font-semibold text-[#050f1e]">{activeTestimonial.name}</h4>
+                  <p className="text-gray-500 text-sm">{activeTestimonial.company}</p>
                 </div>
               </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-              {/* Decorative corner */}
-              <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-[#06b6d4]/15 to-transparent rounded-br-3xl opacity-0 transition-opacity duration-150 ease-out group-hover:opacity-100" />
-            </div>
-          ))}
+        {/* Navigation */}
+        <div className="flex items-center justify-center gap-4 mt-8">
+          <button
+            onClick={handlePrev}
+            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            aria-label="Précédent"
+          >
+            <ChevronLeft className="w-5 h-5 text-[#050f1e]" />
+          </button>
+
+          <div className="flex gap-2">
+            {TESTIMONIALS.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setDirection(index > activeIndex ? 1 : -1);
+                  setActiveIndex(index);
+                }}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === activeIndex ? 'bg-cyan-500 w-6' : 'bg-gray-300 hover:bg-gray-400'
+                }`}
+                aria-label={`Témoignage ${index + 1}`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={handleNext}
+            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            aria-label="Suivant"
+          >
+            <ChevronRight className="w-5 h-5 text-[#050f1e]" />
+          </button>
         </div>
       </div>
     </section>
