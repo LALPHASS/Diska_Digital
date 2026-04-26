@@ -355,7 +355,7 @@ export function HeroSection({ onSplineLoad }: HeroSectionProps) {
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.1] mb-4 font-heading perspective-[1000px]"
           >
             <span className="hero-word text-white">Vos idées, </span>
-            <span className="hero-word hero-gradient text-cyan-400">
+            <span className="hero-word hero-gradient text-cyan-400 whitespace-nowrap">
               notre expertise
             </span>
           </h1>
