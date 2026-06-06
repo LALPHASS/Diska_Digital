@@ -87,7 +87,6 @@ export function HeroSection({ onSplineLoad }: HeroSectionProps) {
   const badgeRef = useRef<HTMLSpanElement>(null);
   const subtextRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 
   const handleGetStarted = () => {
     const contactSection = document.getElementById('contact');
@@ -169,23 +168,6 @@ export function HeroSection({ onSplineLoad }: HeroSectionProps) {
             { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.7)' },
             '-=0.3'
           );
-        }
-
-        if (scrollIndicatorRef.current) {
-          tl.fromTo(scrollIndicatorRef.current,
-            { opacity: 0 },
-            { opacity: 1, duration: 0.6 },
-            '-=0.2'
-          );
-
-          gsap.to(scrollIndicatorRef.current, {
-            y: 8,
-            duration: 1.2,
-            repeat: -1,
-            yoyo: true,
-            ease: 'power1.inOut',
-            delay: 2,
-          });
         }
 
         chars.forEach((char) => {
@@ -371,7 +353,7 @@ export function HeroSection({ onSplineLoad }: HeroSectionProps) {
           {/* Subtext */}
           <p
             ref={subtextRef}
-            className="text-base md:text-lg lg:text-xl text-white/40 max-w-2xl mx-auto mb-10 leading-relaxed font-light tracking-wide opacity-0"
+            className="text-base md:text-lg lg:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed font-light tracking-wide opacity-0"
           >
             Transformez votre présence digitale avec un développement web de pointe, des solutions IT et un design créatif.
           </p>
@@ -423,20 +405,7 @@ export function HeroSection({ onSplineLoad }: HeroSectionProps) {
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div
-        ref={scrollIndicatorRef}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 opacity-0"
-      >
-        <span className="text-xs text-white/30 uppercase tracking-widest">Scroll</span>
-        <div className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center p-1">
-          <motion.div 
-            className="w-1.5 h-3 bg-cyan-400/60 rounded-full"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
-      </div>
+
     </section>
   );
 }

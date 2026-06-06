@@ -1,145 +1,132 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Star, Quote } from 'lucide-react';
 import { TESTIMONIALS } from '@/lib/constants';
-
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 export function TestimonialsSection() {
   const containerRef = useRef<HTMLElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDirection(1);
-      setActiveIndex((prev) => (prev + 1) % TESTIMONIALS.length);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handlePrev = () => {
-    setDirection(-1);
-    setActiveIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
   };
 
-  const handleNext = () => {
-    setDirection(1);
-    setActiveIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.22, 1, 0.36, 1],
+      },
+    },
   };
-
-  const slideVariants = {
-    enter: (direction: number) => ({ x: direction > 0 ? 200 : -200, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (direction: number) => ({ x: direction < 0 ? 200 : -200, opacity: 0 }),
-  };
-
-  const activeTestimonial = TESTIMONIALS[activeIndex];
 
   return (
     <section
       ref={containerRef}
       id="testimonials"
-      className="py-24 lg:py-32 px-4 md:px-8 lg:px-16 bg-white overflow-hidden"
+      className="py-24 lg:py-32 px-4 md:px-8 lg:px-16 bg-gradient-to-b from-white via-cyan-50/30 to-white"
     >
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <motion.div 
+        <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
         >
-          <span className="text-cyan-600 text-sm uppercase tracking-[0.2em] mb-4 block">
+          <span className="text-cyan-600 text-sm uppercase tracking-[0.2em] mb-4 block font-semibold">
             Témoignages
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-[#050f1e]">
-            Ce Que Disent <span className="text-cyan-500">Nos Clients</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4">
+            Ce Que Disent{' '}
+            <span className="bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent">
+              Nos Clients
+            </span>
           </h2>
+          <p className="text-slate-600 text-lg max-w-2xl mx-auto mt-4">
+            Découvrez les retours d&apos;expérience de nos clients satisfaits
+          </p>
         </motion.div>
 
-        {/* Testimonial */}
-        <div className="relative min-h-[300px] flex items-center">
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.div
-              key={activeIndex}
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full text-center"
+        {/* Testimonials Grid */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {TESTIMONIALS.map((testimonial, index) => (
+            <motion.article
+              key={index}
+              variants={cardVariants}
+              className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 hover:border-cyan-200 cursor-default overflow-hidden"
+              whileHover={{ y: -8 }}
             >
-              {/* Stars */}
-              <div className="flex justify-center gap-1 mb-6">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                ))}
+              {/* Decorative Background Quote */}
+              <div className="absolute top-0 right-0 w-32 h-32 opacity-5 -mr-8 -mt-8 text-cyan-500 rotate-12">
+                <Quote className="w-full h-full" />
               </div>
 
-              {/* Quote */}
-              <blockquote className="text-xl md:text-2xl lg:text-3xl text-[#050f1e] leading-relaxed mb-8 font-light">
-                &ldquo;{activeTestimonial.text}&rdquo;
-              </blockquote>
-
-              {/* Author */}
-              <div className="flex items-center justify-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                  <span className="text-white font-bold">{getInitials(activeTestimonial.name)}</span>
+              {/* Content */}
+              <div className="relative z-10">
+                {/* Stars */}
+                <div className="flex gap-1 mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="w-5 h-5 fill-yellow-400 text-yellow-400"
+                      aria-hidden="true"
+                    />
+                  ))}
                 </div>
-                <div className="text-left">
-                  <h4 className="font-semibold text-[#050f1e]">{activeTestimonial.name}</h4>
-                  <p className="text-gray-500 text-sm">{activeTestimonial.company}</p>
+
+                {/* Quote Text */}
+                <blockquote className="text-slate-700 text-base leading-relaxed mb-8 font-normal">
+                  &ldquo;{testimonial.text}&rdquo;
+                </blockquote>
+
+                {/* Author Info */}
+                <div className="flex items-center gap-4 pt-6 border-t border-slate-100">
+                  <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center ring-2 ring-cyan-100 ring-offset-2 flex-shrink-0">
+                    <span className="text-white font-bold text-lg">
+                      {testimonial.name
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2)}
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-900 text-lg">
+                      {testimonial.name}
+                    </h4>
+                    <p className="text-cyan-600 text-sm font-medium">
+                      {testimonial.company}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-center gap-4 mt-8">
-          <button
-            onClick={handlePrev}
-            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
-            aria-label="Précédent"
-          >
-            <ChevronLeft className="w-5 h-5 text-[#050f1e]" />
-          </button>
+              {/* Hover Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-cyan-500/5 group-hover:via-blue-500/5 group-hover:to-purple-500/5 transition-all duration-300 rounded-2xl pointer-events-none" />
+            </motion.article>
+          ))}
+        </motion.div>
 
-          <div className="flex gap-2">
-            {TESTIMONIALS.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setDirection(index > activeIndex ? 1 : -1);
-                  setActiveIndex(index);
-                }}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === activeIndex ? 'bg-cyan-500 w-6' : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-                aria-label={`Témoignage ${index + 1}`}
-              />
-            ))}
-          </div>
 
-          <button
-            onClick={handleNext}
-            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
-            aria-label="Suivant"
-          >
-            <ChevronRight className="w-5 h-5 text-[#050f1e]" />
-          </button>
-        </div>
       </div>
     </section>
   );
