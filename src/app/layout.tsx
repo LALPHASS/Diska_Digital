@@ -1,77 +1,47 @@
-import type { Metadata } from "next";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
-import { cn } from "@/lib/utils";
-
-/**
- * Space Grotesk - modern geometric sans-serif for headings
- * JetBrains Mono - monospace font for tech aesthetic
- */
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  display: "swap",
+import type { Metadata } from 'next';
+import localFont from 'next/font/local';
+import './globals.css';
+const heading = localFont({
+  src: '../../public/fonts/space-grotesk-latin.woff2',
+  variable: '--font-heading',
+  weight: '300 700',
+  display: 'swap'
 });
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  display: "swap",
+const mono = localFont({
+  src: '../../public/fonts/jetbrains-mono-latin.woff2',
+  variable: '--font-mono',
+  weight: '100 800',
+  display: 'swap'
 });
-
-/**
- * Site metadata for SEO and social sharing
- * 
- * Validates: Requirements 12.2, 12.3
- */
+const title = 'Diska Digital — Vos idées. En grand.';
+const description = 'À Bamako, Diska Digital mêle design, développement web, solutions IT et communication print pour donner une nouvelle dimension à votre entreprise.';
 export const metadata: Metadata = {
-  title: "Diska Digital | Web. IT. Design. Print.",
-  description:
-    "Diska Digital est une entreprise technologique premium basée au Mali offrant développement web, branding, services IT, communication print et vente d'équipements informatiques.",
-  keywords: [
-    "développement web",
-    "services IT",
-    "branding",
-    "communication print",
-    "Mali",
-    "agence digitale",
-  ],
+  title,
+  description,
+  keywords: ['agence digitale', 'Bamako', 'Mali', 'développement web', 'design', 'services IT', 'communication print'],
   icons: {
-    icon: "/favicon.ico",
+    icon: '/favicon.ico'
   },
   openGraph: {
-    title: "Diska Digital | Web. IT. Design. Print.",
-    description:
-      "Entreprise technologique premium basée au Mali offrant développement web, branding, services IT, communication print et vente d'équipements informatiques.",
-    type: "website",
-    locale: "fr_FR",
+    title,
+    description,
+    type: 'website',
+    locale: 'fr_FR'
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Diska Digital | Web. IT. Design. Print.",
-    description:
-      "Entreprise technologique premium basée au Mali offrant développement web, branding, services IT, communication print et vente d'équipements informatiques.",
-  },
+    card: 'summary',
+    title,
+    description
+  }
 };
-
-/**
- * RootLayout - Provides global font loading, metadata, and base styling
- * 
- * Validates: Requirements 12.2, 12.3, 13.4
- * - 12.2: Loading screen fades out to reveal Hero when assets loaded
- * - 12.3: Loading screen completes within 3 seconds max
- * - 13.4: Large, bold typography for headings, clean sans-serif fonts
- */
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="fr" className={cn("h-full", "antialiased", spaceGrotesk.variable, jetbrainsMono.variable)}>
-      <body className="min-h-full flex flex-col bg-white text-foreground font-mono">
-        {children}
-      </body>
-    </html>
-  );
+  return <html lang="fr" className={`${heading.variable} ${mono.variable}`}>
+    <body>
+      {children}
+    </body>
+  </html>;
 }

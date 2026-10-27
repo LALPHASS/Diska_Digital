@@ -1,233 +1,124 @@
 'use client';
 
-import { useRef } from 'react';
-import Image from 'next/image';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-import { ArrowUpRight } from 'lucide-react';
-
-gsap.registerPlugin(useGSAP, ScrollTrigger);
-
-const PORTFOLIO_ITEMS = [
-  {
-    id: 1,
-    title: 'Plateforme E-Commerce',
-    category: 'Développement Web',
-    description: 'Boutique en ligne moderne avec paiement rapide et gestion des stocks.',
-    image: '/digital web.jpg',
-    color: '#06b6d4',
-    size: 'large',
-  },
-  {
-    id: 2,
-    title: 'Refonte de Marque',
-    category: 'Branding',
-    description: 'Identité visuelle complète : logo, couleurs et charte graphique.',
-    image: '/print comminication.jpg',
-    color: '#0066cc',
-    size: 'small',
-  },
-  {
-    id: 3,
-    title: 'Infrastructure Réseau',
-    category: 'Services IT',
-    description: 'Configuration réseau sécurisée et architecture évolutive.',
-    image: '/it maintenance.jpg',
-    color: '#14b8a6',
-    size: 'small',
-  },
-  {
-    id: 4,
-    title: 'Campagne Marketing',
-    category: 'Print & Design',
-    description: 'Supports marketing intégrés pour une présence de marque cohérente.',
-    image: '/print comminication.jpg',
-    color: '#8b5cf6',
-    size: 'large',
-  },
-];
-
+import { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, X } from 'lucide-react';
+import { Reveal } from '@/components/ui/Reveal';
+import { ProjectVisual, type VisualKind } from '@/components/ui/ProjectVisual';
+import { ProjectPreview } from '@/components/ui/ProjectPreview';
+const projects: {
+  kind: VisualKind;
+  title: string;
+  category: string;
+  description: string;
+  tags: string[];
+}[] = [{
+  kind: 'segu',
+  title: 'Ségu. Une identité qui prend racine.',
+  category: 'Identité visuelle',
+  description: 'Une exploration de marque qui associe couleurs terracotta, formes organiques et typographie affirmée. Un même langage décliné du logo à la papeterie, pour une identité cohérente et reconnaissable.',
+  tags: ['Direction artistique', 'Branding', 'Papeterie']
+}, {
+  kind: 'kanu',
+  title: 'Kanu. Le digital, tout simplement.',
+  category: 'Expérience web',
+  description: 'Un concept de boutique digitale où les objets et leur histoire prennent le premier rôle. Une navigation lisible, des pages de collection épurées et une expérience pensée aussi bien pour le mobile que pour le grand écran.',
+  tags: ['UI / UX', 'Site web', 'E-commerce']
+}, {
+  kind: 'signal',
+  title: 'Des idées qui font impression.',
+  category: 'Design & Print',
+  description: 'Une étude graphique autour de la force du message : des mots qui occupent l’espace, une palette franche et une composition déclinable sur affiches, supports commerciaux et publications digitales.',
+  tags: ['Design graphique', 'Affiche', 'Communication']
+}, {
+  kind: 'network',
+  title: 'La technologie qui vous relie.',
+  category: 'Solutions IT',
+  description: 'Une visualisation de notre approche IT : connecter les équipements, organiser l’infrastructure et penser la maintenance comme un ensemble. Les solutions sont définies après un audit des besoins de chaque entreprise.',
+  tags: ['Infrastructure', 'Maintenance', 'Équipement']
+}];
 export function PortfolioSection() {
-  const containerRef = useRef<HTMLElement>(null);
-
-  useGSAP(() => {
-    // Header animation
-    gsap.from('.portfolio-header', {
-      opacity: 0,
-      y: 60,
-      duration: 1,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '.portfolio-header',
-        start: 'top 85%',
-        toggleActions: 'play none none reverse',
-      },
-    });
-
-    // Cards staggered animation
-    gsap.from('.portfolio-card', {
-      opacity: 0,
-      y: 80,
-      scale: 0.95,
-      duration: 0.8,
-      stagger: 0.12,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '.portfolio-grid',
-        start: 'top 80%',
-        toggleActions: 'play none none reverse',
-      },
-    });
-
-  }, { scope: containerRef });
-
-  return (
-    <section 
-      ref={containerRef} 
-      id="portfolio" 
-      className="py-24 lg:py-32 px-4 md:px-8 lg:px-16 bg-[#050f1e] overflow-hidden"
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="portfolio-header mb-16 lg:mb-20">
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+  const [selected, setSelected] = useState<number | null>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (selected === null) return;
+    dialog.current?.showModal();
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [selected]);
+  const project = selected === null ? null : projects[selected];
+  return <section id="portfolio" className="work-section section-pad">
+    <div className="shell">
+      <Reveal className="section-intro">
+        <div>
+          <span className="eyebrow">
+            <span className="section-index">01 /</span>
+             Notre univers créatif
+          </span>
+          <h2>
+            Le sens du détail.
+            <br />
+            <span className="serif">Le goût de l’impact.</span>
+          </h2>
+        </div>
+        <p>
+          Quatre explorations pour vous montrer ce qui nous anime.
+          <span className="concept-note">Concepts créatifs, imaginés par Diska Digital.</span>
+        </p>
+      </Reveal>
+      <div className="work-grid">
+        {projects.map((item, i) => <Reveal key={item.kind} delay={i % 2 * 0.1} className="project">
+          <ProjectPreview kind={item.kind} title={item.title} onOpen={() => setSelected(i)} />
+          <div className="project-meta">
             <div>
-              <span className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/50 border border-white/10 rounded-full mb-6">
-                <span className="w-2 h-2 bg-[#06b6d4] rounded-full" />
-                Portfolio
+              <span className="project-category">
+                {item.category}
+                <span>— Concept</span>
               </span>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
-                Nos Réalisations
-              </h2>
-            </div>
-            <p className="text-white/60 max-w-md text-lg lg:text-right">
-              Découvrez nos projets récents et comment nous aidons les entreprises à réussir.
-            </p>
-          </div>
-        </div>
-
-        {/* Portfolio Grid - Bento Style */}
-        <div className="portfolio-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {/* Large Card 1 */}
-          <div className="portfolio-card group relative md:col-span-2 lg:col-span-2 rounded-3xl overflow-hidden cursor-pointer h-[400px] lg:h-[480px]">
-            <Image
-              src={PORTFOLIO_ITEMS[0].image}
-              alt={PORTFOLIO_ITEMS[0].title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
-            
-            {/* Content */}
-            <div className="absolute inset-0 p-8 flex flex-col justify-end">
-              <span 
-                className="inline-flex w-fit px-3 py-1.5 text-xs font-medium rounded-full mb-4"
-                style={{ backgroundColor: `${PORTFOLIO_ITEMS[0].color}`, color: 'white' }}
-              >
-                {PORTFOLIO_ITEMS[0].category}
-              </span>
-              <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2 flex items-center gap-3">
-                {PORTFOLIO_ITEMS[0].title}
-                <ArrowUpRight 
-                  className="w-6 h-6 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300" 
-                />
+              <h3>
+                {item.title}
               </h3>
-              <p className="text-white/70 text-base max-w-md">
-                {PORTFOLIO_ITEMS[0].description}
-              </p>
             </div>
+            <span className="mono">
+              0
+              {i + 1}
+            </span>
           </div>
-
-          {/* Small Card 1 */}
-          <div className="portfolio-card group relative rounded-3xl overflow-hidden cursor-pointer h-[300px] lg:h-[480px]">
-            <Image
-              src={PORTFOLIO_ITEMS[1].image}
-              alt={PORTFOLIO_ITEMS[1].title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
-            
-            <div className="absolute inset-0 p-6 flex flex-col justify-end">
-              <span 
-                className="inline-flex w-fit px-3 py-1.5 text-xs font-medium rounded-full mb-3"
-                style={{ backgroundColor: `${PORTFOLIO_ITEMS[1].color}`, color: 'white' }}
-              >
-                {PORTFOLIO_ITEMS[1].category}
-              </span>
-              <h3 className="text-xl lg:text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                {PORTFOLIO_ITEMS[1].title}
-                <ArrowUpRight 
-                  className="w-5 h-5 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300" 
-                />
-              </h3>
-              <p className="text-white/70 text-sm">
-                {PORTFOLIO_ITEMS[1].description}
-              </p>
-            </div>
-          </div>
-
-          {/* Small Card 2 */}
-          <div className="portfolio-card group relative rounded-3xl overflow-hidden cursor-pointer h-[300px] lg:h-[400px]">
-            <Image
-              src={PORTFOLIO_ITEMS[2].image}
-              alt={PORTFOLIO_ITEMS[2].title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
-            
-            <div className="absolute inset-0 p-6 flex flex-col justify-end">
-              <span 
-                className="inline-flex w-fit px-3 py-1.5 text-xs font-medium rounded-full mb-3"
-                style={{ backgroundColor: `${PORTFOLIO_ITEMS[2].color}`, color: 'white' }}
-              >
-                {PORTFOLIO_ITEMS[2].category}
-              </span>
-              <h3 className="text-xl lg:text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                {PORTFOLIO_ITEMS[2].title}
-                <ArrowUpRight 
-                  className="w-5 h-5 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300" 
-                />
-              </h3>
-              <p className="text-white/70 text-sm">
-                {PORTFOLIO_ITEMS[2].description}
-              </p>
-            </div>
-          </div>
-
-          {/* Large Card 2 */}
-          <div className="portfolio-card group relative md:col-span-2 rounded-3xl overflow-hidden cursor-pointer h-[350px] lg:h-[400px]">
-            <Image
-              src={PORTFOLIO_ITEMS[3].image}
-              alt={PORTFOLIO_ITEMS[3].title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
-            
-            <div className="absolute inset-0 p-8 flex flex-col justify-end">
-              <span 
-                className="inline-flex w-fit px-3 py-1.5 text-xs font-medium rounded-full mb-4"
-                style={{ backgroundColor: `${PORTFOLIO_ITEMS[3].color}`, color: 'white' }}
-              >
-                {PORTFOLIO_ITEMS[3].category}
-              </span>
-              <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2 flex items-center gap-3">
-                {PORTFOLIO_ITEMS[3].title}
-                <ArrowUpRight 
-                  className="w-6 h-6 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300" 
-                />
-              </h3>
-              <p className="text-white/70 text-base max-w-md">
-                {PORTFOLIO_ITEMS[3].description}
-              </p>
-            </div>
-          </div>
-        </div>
+        </Reveal>)}
       </div>
-    </section>
-  );
+      <div className="work-bottom">
+        <span className="mono">Une idée ne demande qu’à devenir réelle.</span>
+        <a className="text-link" href="#contact">
+          Et si la prochaine était la vôtre ?
+          <ArrowUpRight size={18} />
+        </a>
+      </div>
+    </div>
+    <dialog className="project-dialog" ref={dialog} onClose={() => setSelected(null)} onClick={event => {
+      if (event.target === event.currentTarget) dialog.current?.close();
+    }} aria-labelledby="project-dialog-title">
+      {project && <><button className="dialog-close" aria-label="Fermer le concept" onClick={() => dialog.current?.close()}>
+          <X />
+        </button><ProjectVisual kind={project.kind} /><div className="dialog-copy">
+          <span className="eyebrow">Exploration créative · Concept de démonstration</span>
+          <h2 id="project-dialog-title">
+            {project.title}
+          </h2>
+          <p>
+            {project.description}
+          </p>
+          <div className="tags">
+            {project.tags.map(tag => <span key={tag}>
+              {tag}
+            </span>)}
+          </div>
+          <a className="button button-dark" href="#contact" onClick={() => dialog.current?.close()}>
+            Créer votre propre projet
+            <ArrowUpRight size={18} />
+          </a>
+        </div></>}
+    </dialog>
+  </section>;
 }

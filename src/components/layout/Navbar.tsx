@@ -1,199 +1,118 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowUpRight, Menu, X } from 'lucide-react';
+import { Brand } from '@/components/ui/Brand';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { cn } from '@/lib/utils';
-
-const NAV_LINKS = [
-  { label: 'Services', href: '#services' },
-  { label: 'Processus', href: '#process' },
-  { label: 'Réalisations', href: '#portfolio' },
-];
-
-// Sections with light/white backgrounds
-const LIGHT_SECTIONS = ['services', 'testimonials'];
-
-/**
- * Floating navbar with pill design
- */
+const links = [{
+  label: 'Notre univers',
+  href: '#portfolio'
+}, {
+  label: 'Expertises',
+  href: '#services'
+}, {
+  label: 'Le studio',
+  href: '#about'
+}];
 export function Navbar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isOnLightBg, setIsOnLightBg] = useState(false);
-  const prefersReducedMotion = useReducedMotion();
-
-  // Detect if navbar is over a light background section
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState('#hero');
+  const reduced = useReducedMotion();
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const checkBackground = () => {
-      const navbarY = 60; // Approximate navbar position from top
-      
-      for (const sectionId of LIGHT_SECTIONS) {
-        const section = document.getElementById(sectionId);
-        if (section) {
-          const rect = section.getBoundingClientRect();
-          if (rect.top <= navbarY && rect.bottom >= navbarY) {
-            setIsOnLightBg(true);
-            return;
-          }
-        }
-      }
-      setIsOnLightBg(false);
-    };
-
-    window.addEventListener('scroll', checkBackground, { passive: true });
-    checkBackground(); // Initial check
-
-    return () => window.removeEventListener('scroll', checkBackground);
+    const sections = document.querySelectorAll<HTMLElement>('main > section[id]');
+    const observer = new IntersectionObserver(entries => {
+      const current = entries.find(entry => entry.isIntersecting);
+      if (current) setActive(`#${current.target.id}`);
+    }, { rootMargin: '-20% 0px -65% 0px' });
+    sections.forEach(section => observer.observe(section));
+    return () => observer.disconnect();
   }, []);
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const targetId = href.replace('#', '');
-    const element = document.getElementById(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-    setIsMobileMenuOpen(false);
-  };
-
-  const menuVariants = {
-    closed: { opacity: 0, y: -20 },
-    open: { opacity: 1, y: 0 },
-  };
-
-  const linkVariants = {
-    closed: { opacity: 0, y: 20 },
-    open: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.1, duration: 0.3 },
-    }),
-  };
-
-  return (
-    <nav className="fixed top-4 left-4 right-4 z-50">
-      {/* Desktop Navbar - Floating pill with glassmorphism */}
-      <div className={cn(
-        "hidden md:flex items-center justify-between max-w-4xl mx-auto px-2 py-2 backdrop-blur-xl rounded-full border transition-colors duration-300",
-        isOnLightBg 
-          ? "bg-[#050f1e]/80 border-[#050f1e]/20" 
-          : "bg-white/5 border-white/10"
-      )}>
-        {/* Logo */}
-        <a
-          href="#hero"
-          onClick={(e) => handleNavClick(e, '#hero')}
-          className="flex items-center gap-2 pl-4 cursor-pointer"
-        >
-          <Image
-            src="/logo.webp"
-            alt="Diska Digital"
-            width={24}
-            height={24}
-            className="w-5 h-5"
-          />
-          <span className="text-sm font-semibold text-white">
-            Diska Digital
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const background = Array.from(document.querySelectorAll<HTMLElement>('main, footer'));
+    const previousInert = background.map(element => element.inert);
+    background.forEach(element => {
+      element.inert = true;
+    });
+    menu.current?.querySelector<HTMLAnchorElement>('a')?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+        menuButton.current?.focus();
+      }
+      if (event.key !== 'Tab') return;
+      const items = [menuButton.current, ...Array.from(menu.current?.querySelectorAll<HTMLAnchorElement>('a') ?? [])].filter(Boolean) as HTMLElement[];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    const onResize = () => {
+      if (window.innerWidth >= 900) setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('resize', onResize);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      background.forEach((element, index) => {
+        element.inert = previousInert[index];
+      });
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [open]);
+  return <header className="site-header">
+    <div className="header-inner shell">
+      <a href="#hero" aria-label="Diska Digital, accueil" className="brand-link" onClick={() => setOpen(false)}>
+        <Brand />
+      </a>
+      <nav className="desktop-nav" aria-label="Navigation principale">
+        {links.map(link => <a key={link.href} href={link.href} aria-current={active === link.href ? 'location' : undefined}>
+          {link.label}
+        </a>)}
+      </nav>
+      <a href="#contact" className="header-cta" onClick={() => setOpen(false)}>
+        Un projet en tête ?
+        <ArrowUpRight size={18} />
+      </a>
+      <button className="menu-toggle" ref={menuButton} aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'} onClick={() => setOpen(!open)}>
+        {open ? <X /> : <Menu />}
+      </button>
+    </div>
+    <AnimatePresence initial={false}>
+    {open && <motion.div key="navigation" id="mobile-navigation" className="mobile-menu" ref={menu}
+      initial={{ clipPath: reduced ? 'inset(0)' : 'inset(0 0 100% 0)' }}
+      animate={{ clipPath: 'inset(0)' }} exit={{ clipPath: 'inset(0 0 100% 0)' }}
+      transition={{ duration: reduced ? 0 : 0.45, ease: [0.76, 0, 0.24, 1] }}>
+      <span className="eyebrow">Bienvenue dans notre univers</span>
+      <nav aria-label="Navigation mobile">
+        {[...links, {
+          label: 'Parlons de votre projet',
+          href: '#contact'
+        }].map((link, i) => <motion.a key={link.href} href={link.href} onClick={() => setOpen(false)}
+          aria-current={active === link.href ? 'location' : undefined}
+          initial={reduced ? false : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reduced ? 0 : 0.45, delay: reduced ? 0 : 0.12 + i * 0.06 }}>
+          <span className="mono">
+            0
+            {i + 1}
           </span>
-        </a>
-
-        {/* Center Navigation */}
-        <div className="flex items-center gap-1">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => handleNavClick(e, link.href)}
-              className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors duration-200 cursor-pointer"
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
-
-        {/* Contact Button */}
-        <a
-          href="#contact"
-          onClick={(e) => handleNavClick(e, '#contact')}
-          className="px-5 py-2 text-sm font-medium text-[#0a0a0a] bg-white rounded-full hover:bg-white/90 transition-colors duration-200 cursor-pointer"
-        >
-          Contact
-        </a>
-      </div>
-
-      {/* Mobile Navbar */}
-      <div className={cn(
-        "md:hidden flex items-center justify-between px-4 py-3 backdrop-blur-xl rounded-full border transition-colors duration-300",
-        isOnLightBg 
-          ? "bg-[#050f1e]/80 border-[#050f1e]/20" 
-          : "bg-white/5 border-white/10"
-      )}>
-        {/* Logo */}
-        <a
-          href="#hero"
-          onClick={(e) => handleNavClick(e, '#hero')}
-          className="flex items-center gap-2 cursor-pointer"
-        >
-          <Image
-            src="/logo.webp"
-            alt="Diska Digital"
-            width={24}
-            height={24}
-            className="w-5 h-5"
-          />
-          <span className="text-sm font-semibold text-white">
-            Diska Digital
-          </span>
-        </a>
-
-        {/* Menu Button */}
-        <button
-          className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-white hover:text-white/70 transition-colors cursor-pointer"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label={isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-          aria-expanded={isMobileMenuOpen}
-        >
-          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-
-      {/* Mobile Menu Dropdown */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            className={cn(
-              "md:hidden mt-2 mx-auto backdrop-blur-xl rounded-2xl border overflow-hidden",
-              isOnLightBg 
-                ? "bg-[#050f1e]/90 border-[#050f1e]/20" 
-                : "bg-white/5 border-white/10"
-            )}
-            initial={prefersReducedMotion ? { opacity: 1 } : 'closed'}
-            animate={prefersReducedMotion ? { opacity: 1 } : 'open'}
-            exit={prefersReducedMotion ? { opacity: 0 } : 'closed'}
-            variants={prefersReducedMotion ? undefined : menuVariants}
-            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' }}
-          >
-            <div className="flex flex-col p-4 space-y-1">
-              {[...NAV_LINKS, { label: 'Contact', href: '#contact' }].map((link, i) => (
-                <motion.a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className="px-4 py-3 text-base text-white/80 hover:text-white hover:bg-white/5 rounded-xl transition-colors cursor-pointer"
-                  custom={i}
-                  initial={prefersReducedMotion ? { opacity: 1 } : 'closed'}
-                  animate={prefersReducedMotion ? { opacity: 1 } : 'open'}
-                  variants={prefersReducedMotion ? undefined : linkVariants}
-                >
-                  {link.label}
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
-  );
+          {link.label}
+          <ArrowUpRight />
+        </motion.a>)}
+      </nav>
+      <span className="mobile-menu-location">Bamako, Mali. Des idées sans frontières.</span>
+    </motion.div>}
+    </AnimatePresence>
+  </header>;
 }
